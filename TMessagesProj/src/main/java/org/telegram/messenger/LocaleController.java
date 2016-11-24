@@ -15,12 +15,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.text.format.DateFormat;
 import android.util.Xml;
 
 import org.telegram.messenger.time.FastDateFormat;
 import org.telegram.tgnet.ConnectionsManager;
 import org.telegram.tgnet.TLRPC;
+import org.telegram.ui.SolarCalendar;
 import org.xmlpull.v1.XmlPullParser;
 
 import java.io.File;
@@ -45,7 +45,8 @@ public class LocaleController {
 
     public static boolean isRTL = false;
     public static int nameDisplayOrder = 1;
-    private static boolean is24HourFormat = false;
+    //  private static boolean is24HourFormat = false;
+    private static boolean is24HourFormat = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE).getBoolean("enable24HourFormat", false);
     public FastDateFormat formatterDay;
     public FastDateFormat formatterWeek;
     public FastDateFormat formatterMonth;
@@ -154,6 +155,14 @@ public class LocaleController {
                 "tr", "vi", "wo", "yo", "zh", "bo", "dz", "id", "jv", "ka", "km", "kn", "ms", "th"}, new PluralRules_None());
 
         LocaleInfo localeInfo = new LocaleInfo();
+        localeInfo.name = "پارسی";
+        localeInfo.nameEnglish = "Persian";
+        localeInfo.shortName = "fa";
+        localeInfo.pathToFile = null;
+        sortedLanguages.add(localeInfo);
+        languagesDict.put(localeInfo.shortName, localeInfo);
+
+        localeInfo = new LocaleInfo();
         localeInfo.name = "English";
         localeInfo.nameEnglish = "English";
         localeInfo.shortName = "en";
@@ -244,15 +253,17 @@ public class LocaleController {
         localeInfo.shortName = null;
         localeInfo.pathToFile = null;
         sortedLanguages.add(0, localeInfo);
+        systemDefaultLocale = new Locale("fa", "IR");
 
-        systemDefaultLocale = Locale.getDefault();
-        is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        // is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        is24HourFormat =true;
         LocaleInfo currentInfo = null;
         boolean override = false;
 
         try {
             SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE);
-            String lang = preferences.getString("language", null);
+            String lang = "fa";
+            lang = preferences.getString("language", "fa");
             if (lang != null) {
                 currentInfo = languagesDict.get(lang);
                 if (currentInfo != null) {
@@ -267,7 +278,7 @@ public class LocaleController {
                 currentInfo = languagesDict.get(getLocaleString(systemDefaultLocale));
             }
             if (currentInfo == null) {
-                currentInfo = languagesDict.get("en");
+                currentInfo = languagesDict.get("fa");
             }
             applyLanguage(currentInfo, override);
         } catch (Exception e) {
@@ -309,15 +320,15 @@ public class LocaleController {
         return systemDefaultLocale;
     }
 
-    private String getLocaleString(Locale locale) {
+    public static String getLocaleString(Locale locale) {
         if (locale == null) {
-            return "en";
+            return "fa";
         }
         String languageCode = locale.getLanguage();
         String countryCode = locale.getCountry();
         String variantCode = locale.getVariant();
         if (languageCode.length() == 0 && countryCode.length() == 0) {
-            return "en";
+            return "fa";
         }
         StringBuilder result = new StringBuilder(11);
         result.append(languageCode);
@@ -335,13 +346,13 @@ public class LocaleController {
     public static String getLocaleStringIso639() {
         Locale locale = getInstance().getSystemDefaultLocale();
         if (locale == null) {
-            return "en";
+            return "fa";
         }
         String languageCode = locale.getLanguage();
         String countryCode = locale.getCountry();
         String variantCode = locale.getVariant();
         if (languageCode.length() == 0 && countryCode.length() == 0) {
-            return "en";
+            return "fa";
         }
         StringBuilder result = new StringBuilder(11);
         result.append(languageCode);
@@ -580,7 +591,7 @@ public class LocaleController {
                 currentLocaleInfo = localeInfo;
                 currentPluralRules = allRules.get(currentLocale.getLanguage());
                 if (currentPluralRules == null) {
-                    currentPluralRules = allRules.get("en");
+                    currentPluralRules = allRules.get("fa");
                 }
                 changingConfiguration = true;
                 Locale.setDefault(currentLocale);
@@ -668,7 +679,9 @@ public class LocaleController {
         if (changingConfiguration) {
             return;
         }
-        is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        // is24HourFormat = DateFormat.is24HourFormat(ApplicationLoader.applicationContext);
+        is24HourFormat = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", Activity.MODE_PRIVATE).getBoolean("enable24HourFormat", false);
+
         systemDefaultLocale = newConfig.locale;
         if (languageOverride != null) {
             LocaleInfo toSet = currentLocaleInfo;
@@ -685,28 +698,53 @@ public class LocaleController {
                 currentLocale = newLocale;
                 currentPluralRules = allRules.get(currentLocale.getLanguage());
                 if (currentPluralRules == null) {
-                    currentPluralRules = allRules.get("en");
+                    currentPluralRules = allRules.get("fa");
                 }
             }
         }
     }
 
-    public static String formatDateChat(long date) {
+    public static String formatIntervalHijri(int seconds) {
         try {
-            Calendar rightNow = Calendar.getInstance();
-            int year = rightNow.get(Calendar.YEAR);
-
-            rightNow.setTimeInMillis(date * 1000);
-            int dateYear = rightNow.get(Calendar.YEAR);
-
-            if (year == dateYear) {
-                return getInstance().chatDate.format(date * 1000);
+            int minutes = seconds / 60;
+            int hours = minutes / 60;
+            Object[] objArr;
+            if (seconds < 120) {
+                objArr = new Object[QUANTITY_ZERO];
+                objArr[QUANTITY_OTHER] = Integer.valueOf(seconds);
+                return String.format("%d ثانیه", objArr);
+            } else if (minutes < 120) {
+                objArr = new Object[QUANTITY_ZERO];
+                objArr[QUANTITY_OTHER] = Integer.valueOf(minutes);
+                return String.format("%d دقیقه", objArr);
+            } else {
+                objArr = new Object[QUANTITY_ZERO];
+                objArr[QUANTITY_OTHER] = Integer.valueOf(hours);
+                return String.format("%d ساعت", objArr);
             }
-            return getInstance().chatFullDate.format(date * 1000);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             FileLog.e("tmessages", e);
+            return "\u062e\u0637\u0627\u06cc \u062a\u0627\u0631\u06cc\u062e\u06cc";
         }
-        return "LOC_ERR: formatDateChat";
+    }
+
+    public static String formatDateChat(long date) {
+
+        Calendar rightNow = Calendar.getInstance();
+        int year = rightNow.get(Calendar.YEAR);
+        rightNow.setTimeInMillis(date * 1000);
+        int dateYear = rightNow.get(Calendar.YEAR);
+        boolean persianDate = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0).getBoolean("persian_date", true);
+        if (year != dateYear) {
+            if (persianDate) {
+                return new SolarCalendar(rightNow).getNumDate();
+            }
+            return "LOC_ERR: formatDateChat";
+        } else if (persianDate) {
+            return new SolarCalendar(rightNow).getShortDesDate();
+        } else {
+            return getInstance().chatDate.format(date * 1000);
+        }
     }
 
     public static String formatDate(long date) {
@@ -765,7 +803,18 @@ public class LocaleController {
             rightNow.setTimeInMillis(date * 1000);
             int dateDay = rightNow.get(Calendar.DAY_OF_YEAR);
             int dateYear = rightNow.get(Calendar.YEAR);
-
+            boolean persianDate = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", QUANTITY_OTHER).getBoolean("persian_date", true);
+            Object[] objArr;
+            if (dateDay == day && year == dateYear) {
+                if (persianDate) {
+                    return getString("LastSeen", R.string.LastSeen) + " " + getString("TodayAt", R.string.TodayAt) + " " + new SolarCalendar(rightNow).getTime();
+                }
+                objArr = new Object[3];
+                objArr[QUANTITY_OTHER] = getString("LastSeen", R.string.LastSeen);
+                objArr[QUANTITY_ZERO] = getString("TodayAt", R.string.TodayAt);
+                objArr[QUANTITY_ONE] = getInstance().formatterDay.format(new Date(1000 * date));
+                return String.format("%s %s %s", objArr);
+            }
             if (dateDay == day && year == dateYear) {
                 return String.format("%s %s %s", LocaleController.getString("LastSeen", R.string.LastSeen), LocaleController.getString("TodayAt", R.string.TodayAt), getInstance().formatterDay.format(new Date(date * 1000)));
                 /*int diff = (int) (ConnectionsManager.getInstance().getCurrentTime() - date) / 60;
@@ -812,9 +861,11 @@ public class LocaleController {
         }
         String lang = locale.getLanguage();
         if (lang == null) {
-            lang = "en";
+            lang = "fa";
         }
         isRTL = lang.toLowerCase().equals("ar");
+        SharedPreferences preferences = ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0);
+        isRTL = preferences.getBoolean("is_rtl", true);
         nameDisplayOrder = lang.toLowerCase().equals("ko") ? 2 : 1;
 
         formatterMonth = createFormatter(locale, getStringInternal("formatterMonth", R.string.formatterMonth), "dd MMM");
@@ -855,6 +906,9 @@ public class LocaleController {
     }
 
     public static String formatShortNumber(int number, int[] rounded) {
+        if (ApplicationLoader.applicationContext.getSharedPreferences("mainconfig", 0).getBoolean("exact_count", true)) {
+            return String.valueOf(number);
+        }
         String K = "";
         int lastDec = 0;
         int KCount = 0;
@@ -885,6 +939,7 @@ public class LocaleController {
     }
 
     public static String formatUserStatus(TLRPC.User user) {
+
         if (user != null && user.status != null && user.status.expires == 0) {
             if (user.status instanceof TLRPC.TL_userStatusRecently) {
                 user.status.expires = -100;
@@ -914,11 +969,13 @@ public class LocaleController {
                     return getString("WithinAWeek", R.string.WithinAWeek);
                 } else if (user.status.expires == -102) {
                     return getString("WithinAMonth", R.string.WithinAMonth);
-                }  else {
+                } else {
                     return formatDateOnline(user.status.expires);
                 }
             }
         }
+
+
     }
 
     public String getTranslitString(String src) {

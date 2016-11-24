@@ -272,6 +272,14 @@
         <meta-data android:name="com.google.android.gms.car.application" android:resource="@xml/automotive_app_desc" />
 
         <meta-data android:name="com.google.android.gms.vision.DEPENDENCIES" android:value="face" />
+        <activity
+            android:name="org.telegram.ui.Components.FilterActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Transparency"></activity>
+
+        <service android:name="org.telegram.ui.Components.MainService"
+
+            ></service>
     </application>
 
 </manifest>

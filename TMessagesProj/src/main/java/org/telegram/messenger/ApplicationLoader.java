@@ -20,8 +20,6 @@ import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.res.Configuration;
-import android.graphics.Shader;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -205,7 +203,7 @@ public class ApplicationLoader extends Application {
         } catch (Exception e) {
             FileLog.e("tmessages", e);
         }
-        return new File("/data/data/org.telegram.messenger/files");
+        return new File("/data/data/ir.samaanak.purpletg/files");
     }
 
     public static void postInitApplication() {
@@ -253,13 +251,13 @@ public class ApplicationLoader extends Application {
             appVersion = pInfo.versionName + " (" + pInfo.versionCode + ")";
             systemVersion = "SDK " + Build.VERSION.SDK_INT;
         } catch (Exception e) {
-            langCode = "en";
+            langCode = "fa";
             deviceModel = "Android unknown";
             appVersion = "App version unknown";
             systemVersion = "SDK " + Build.VERSION.SDK_INT;
         }
         if (langCode.trim().length() == 0) {
-            langCode = "en";
+            langCode = "fa";
         }
         if (deviceModel.trim().length() == 0) {
             deviceModel = "Android unknown";

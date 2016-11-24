@@ -27,7 +27,7 @@ import org.telegram.messenger.R;
 
 public class Theme {
 
-    public static final int ACTION_BAR_COLOR = 0xff527da3;
+    public static final int ACTION_BAR_COLOR = 0xffa164be;
     public static final int ACTION_BAR_PHOTO_VIEWER_COLOR = 0x7f000000;
     public static final int ACTION_BAR_MEDIA_PICKER_COLOR = 0xff333333;
     public static final int ACTION_BAR_VIDEO_EDIT_COLOR = 0xff000000;
@@ -35,7 +35,7 @@ public class Theme {
     public static final int ACTION_BAR_PLAYER_COLOR = 0xffffffff;
     public static final int ACTION_BAR_TITLE_COLOR = 0xffffffff;
     public static final int ACTION_BAR_SUBTITLE_COLOR = 0xffd5e8f7;
-    public static final int ACTION_BAR_PROFILE_COLOR = 0xff598fba;
+    public static final int ACTION_BAR_PROFILE_COLOR = 0xffa164be;
     public static final int ACTION_BAR_PROFILE_SUBTITLE_COLOR = 0xffd7eafa;
     public static final int ACTION_BAR_MAIN_AVATAR_COLOR = 0xff5085b1;
     public static final int ACTION_BAR_ACTION_MODE_TEXT_COLOR = 0xff737373;

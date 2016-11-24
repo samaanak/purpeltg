@@ -3,8 +3,8 @@
 
 
 <resources>
-    <string name="AppName">Telegram</string>
-    <string name="AppNameBeta">Telegram Beta</string>
+    <string name="AppName">Purple Tg</string>
+    <string name="AppNameBeta">Purple Tg</string>
     <string name="LanguageName">English</string>
     <string name="LanguageNameInEnglish">English</string>
     <string name="LanguageCode">en</string>
@@ -1296,4 +1296,11 @@
     <string name="formatterDay24H">HH:mm</string>
     <string name="formatterDay12H">h:mm a</string>
     <string name="formatDateAtTime">%1$s at %2$s</string>
+    <string name="light">light</string>
+    <string name="Active">Active</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="blue">Blue</string>
+    <string name="ApplyFilter">Apply Filter</string>
+    <string name="RemoveFilter">Remove Filter</string>
 </resources>
